@@ -7,7 +7,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
+
+        :root { color-scheme: dark; }
+        html, body { margin: 0; padding: 0; width: 100%; }
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            overscroll-behavior: none;
+            touch-action: manipulation;
+        }
+        #app { width: 100%; height: 100dvh; min-height: 100dvh; }
 
         .glass {
             background: rgba(255,255,255,0.05);
@@ -200,6 +210,95 @@
         .ui-mode-4 #log-close-btn {
             display: none !important;
         }
+
+        @media (max-width: 768px) {
+            html, body, #app {
+                height: 100dvh !important;
+                min-height: 100dvh !important;
+            }
+            body {
+                overflow: hidden;
+            }
+            #start-screen, #enemy-select-screen, #reward-screen, #end-screen {
+                padding: 1rem;
+                overflow-y: auto;
+            }
+            #start-screen h1 {
+                font-size: clamp(2rem, 10vw, 3.25rem) !important;
+            }
+            #enemy-select-screen h1 {
+                font-size: clamp(1.8rem, 7vw, 2.6rem) !important;
+            }
+            #enemy-select-container {
+                padding: 0 0.5rem !important;
+                gap: 0.75rem !important;
+            }
+            #enemy-select-container > div {
+                width: min(100%, 18rem) !important;
+            }
+            .ui-mode-4 #battle-screen {
+                height: 100dvh !important;
+                min-height: 100dvh !important;
+            }
+            .ui-mode-4 .battle-main {
+                min-height: 0 !important;
+            }
+            .ui-mode-4 .enemy-area {
+                height: auto !important;
+                min-height: 0 !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
+            .ui-mode-4 .enemy-area > .absolute {
+                position: static !important;
+                width: min(100%, 20rem) !important;
+                margin-top: 0.75rem !important;
+                padding: 0 1rem !important;
+            }
+            .ui-mode-4 #battle-log-container {
+                height: auto !important;
+                min-height: 140px !important;
+                max-height: 32vh !important;
+                padding: 0 0.75rem 0.5rem !important;
+            }
+            .ui-mode-4 .player-area {
+                height: auto !important;
+                min-height: 0 !important;
+                padding: 0.75rem 0.75rem 1rem !important;
+            }
+            .ui-mode-4 .player-area > .flex.justify-between.items-end.mb-4 {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.75rem !important;
+            }
+            .ui-mode-4 .player-area > .flex.justify-between.items-end.mb-4 > .flex.gap-4.flex-wrap {
+                justify-content: center !important;
+            }
+            .ui-mode-4 .player-area > .flex.justify-between.items-end.mb-4 > .flex.gap-6.items-center.flex-wrap.justify-end {
+                justify-content: flex-start !important;
+                align-items: flex-start !important;
+                gap: 0.75rem !important;
+            }
+            .ui-mode-4 #end-turn-btn {
+                width: 100% !important;
+                margin-left: 0 !important;
+                margin-top: 0.25rem !important;
+                padding: 0.8rem 1rem !important;
+            }
+            .ui-mode-4 #hand-container {
+                height: auto !important;
+                min-height: 7.5rem !important;
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                padding-bottom: 0.25rem !important;
+            }
+            .ui-mode-4 #turn-banner h2 {
+                font-size: clamp(1.5rem, 6vw, 2.25rem) !important;
+                letter-spacing: 0.12em !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen overflow-hidden select-none">
@@ -347,8 +446,8 @@
     // ========================
     const CARDS = {
         // 炎
-        'hidane':      { name:'火種',        ap:1, mana:0, desc:'敵に3ダメ。デッキに火花×3。',                           effect: g => { g.damageEnemy(3); g.addCardsToDeck('hibana',3); } },
-        'hibana':      { name:'火花',        ap:0, mana:1, keywords:['sokkou','jogai'], desc:'敵に2ダメ。除外。',          effect: g => { g.damageEnemy(2); } },
+        'hidane':      { name:'火種',        ap:1, mana:0, desc:'敵に3ダメ。デッキに火花×3追加。',                           effect: g => { g.damageEnemy(3); g.addCardsToDeck('hibana',3); } },
+        'hibana':      { name:'火花',        ap:0, mana:0, keywords:['sokkou','jogai'], desc:'敵に2ダメ。除外。',          effect: g => { g.damageEnemy(2); } },
         'nainen':      { name:'内燃',        ap:1, mana:0, desc:'火花2枚除外。攻撃力+2(永続)。',                         effect: g => { g.exileFromDeck('hibana',2); g.player.buffs.atkBonus += 2; log('▶ 攻撃力 +2！'); } },
         'daienjou':    { name:'大炎上',      ap:1, mana:2, desc:'10ダメ＋除外済カード数×2。',                            effect: g => { g.damageEnemy(10 + g.player.exile.length*2); } },
         // 氷
